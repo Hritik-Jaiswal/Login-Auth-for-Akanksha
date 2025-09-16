@@ -1,0 +1,140 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>Login</h2>
+      <p>Please enter your credentials</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()" class="login-form">
+      <!-- Username Field -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-group">
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Enter your username"
+            [class.error]="usernameError"
+            [disabled]="loading"
+          />
+          <button
+            type="button"
+            class="check-btn"
+            (click)="checkUser()"
+            [disabled]="loading || !loginForm.get('username')?.value?.trim()"
+          >
+            <span *ngIf="!loading">Check</span>
+            <span *ngIf="loading" class="spinner"></span>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="usernameError">
+          {{ usernameError }}
+        </div>
+        <div class="success-indicator" *ngIf="usernameChecked && !usernameError">
+          ✓ Username verified
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">
+          {{ passwordAlreadySet ? 'Password' : 'Create Password' }}
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          [placeholder]="passwordAlreadySet ? 'Enter your password' : 'Create a new password'"
+          [class.error]="passwordError"
+          [disabled]="loading || !usernameChecked"
+        />
+        <div class="error-message" *ngIf="passwordError">
+          {{ passwordError }}
+        </div>
+      </div>
+
+      <!-- Account Lockout Warning -->
+      <div class="lockout-warning" *ngIf="authState?.isLocked">
+        <div class="warning-icon">⚠️</div>
+        <div class="warning-content">
+          <p>Account temporarily locked</p>
+          <p class="countdown">Time remaining: {{ lockoutTimeFormatted }}</p>
+        </div>
+      </div>
+
+      <!-- Failed Attempts Warning -->
+      <div class="attempts-warning" *ngIf="authState && authState.failedAttempts > 0 && !authState.isLocked">
+        <div class="warning-icon">⚠️</div>
+        <p>{{ authState.failedAttempts }} failed attempt(s). Account will be locked after 3 failed attempts.</p>
+      </div>
+
+      <!-- Message Display -->
+      <div class="message" [ngClass]="messageType" *ngIf="message">
+        <div class="message-icon">
+          <span *ngIf="messageType === 'success'">✓</span>
+          <span *ngIf="messageType === 'error'">✗</span>
+          <span *ngIf="messageType === 'warning'">⚠️</span>
+          <span *ngIf="messageType === 'info'">ℹ️</span>
+        </div>
+        <p>{{ message }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <button
+          type="submit"
+          class="submit-btn"
+          [disabled]="loading || !usernameChecked || authState?.isLocked"
+        >
+          <span *ngIf="!loading">
+            {{ passwordAlreadySet ? 'Login' : 'Create Password' }}
+          </span>
+          <span *ngIf="loading" class="spinner"></span>
+        </button>
+
+        <button
+          type="button"
+          class="reset-btn"
+          (click)="resetForm()"
+          [disabled]="loading"
+        >
+          Reset
+        </button>
+      </div>
+
+      <!-- Forgot Password Section -->
+      <div class="forgot-password-section" *ngIf="usernameChecked || showForgotPassword">
+        <div class="divider">
+          <span>or</span>
+        </div>
+        
+        <button
+          type="button"
+          class="forgot-password-btn"
+          (click)="forgotPassword()"
+          [disabled]="loading"
+        >
+          <span *ngIf="!loading">Forgot Password?</span>
+          <span *ngIf="loading" class="spinner"></span>
+        </button>
+        
+        <p class="forgot-password-help">
+          Click here to reset your password via email
+        </p>
+      </div>
+
+      <!-- Security Info -->
+      <div class="security-info">
+        <div class="security-item">
+          <span class="security-icon">🔒</span>
+          <span>Your data is encrypted and secure</span>
+        </div>
+        <div class="security-item">
+          <span class="security-icon">🛡️</span>
+          <span>Account locked after 3 failed attempts</span>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
